@@ -6,6 +6,7 @@ import HomePage from "../Pages/HomePage";
 import Diagnose from "../Pages/Diagnose";
 import Result from "../Pages/Result";
 import AboutPage from "../Pages/AboutPage";
+import RareDiseases from "../Pages/RareDiseases";
 
 const AppRoutes = () => {
   return (
@@ -15,6 +16,7 @@ const AppRoutes = () => {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/diagnose" element={<Diagnose />} />
       <Route path="/results" element={<Result />} />
+      <Route path="/rare-diseases" element={<RareDiseases />} />
     </Routes>
   );
 };

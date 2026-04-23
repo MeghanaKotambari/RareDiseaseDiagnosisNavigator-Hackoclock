@@ -20,6 +20,7 @@ const Navbar = () => {
       <div className="hidden md:flex gap-6 text-[#1E3A8A] font-medium">
         <button onClick={() => navigate("/home")} className="hover:text-[#10B981] transition">Home</button>
         <button onClick={() => navigate("/diagnose")} className="hover:text-[#10B981] transition">Diagnose</button>
+        <button onClick={() => navigate("/rare-diseases")} className="hover:text-[#10B981] transition">Rare Diseases</button>
         <button onClick={() => navigate("/about")} className="hover:text-[#10B981] transition">About</button>
       </div>
 
