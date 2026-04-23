@@ -65,6 +65,53 @@ const getDiagnosis = async (req, res) => {
   }
 };
 
+const getSpecialists = (req, res) => {
+  try {
+    const { diseaseName } = req.params;
+    const doctorsAndHospitals = require('../data/doctorsAndHospitals');
+
+    if (!diseaseName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Disease name is required',
+      });
+    }
+
+    // Convert disease name to lowercase for case-insensitive matching
+    const normalizedDiseaseName = diseaseName.toLowerCase().trim();
+
+    // Find matching disease in the database
+    const diseaseData = Object.keys(doctorsAndHospitals).find(
+      (key) => key.toLowerCase() === normalizedDiseaseName
+    );
+
+    if (!diseaseData) {
+      // Return generic response if disease not found
+      return res.status(200).json({
+        success: true,
+        data: {
+          specialists: [],
+          hospitals: [],
+          tests: 'Consult with your healthcare provider for recommended tests',
+          message: 'Specific specialist information not available. Please contact nearby major hospitals.',
+        },
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: doctorsAndHospitals[diseaseData],
+    });
+  } catch (error) {
+    console.error('Specialists controller error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching specialist information',
+    });
+  }
+};
+
 module.exports = {
   getDiagnosis,
+  getSpecialists,
 };

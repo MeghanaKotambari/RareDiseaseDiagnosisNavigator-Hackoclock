@@ -19,8 +19,9 @@ Sanjeevani AI is a web application that leverages advanced AI models to provide 
 - 💯 **99% Accuracy** - Based on comprehensive medical data and latest research
 - ⚡ **Fast Results** - Get diagnostic suggestions in seconds, not days
 - 📊 **Confidence Scoring** - Each diagnosis includes confidence percentages and reasoning
-- � **Symptom Timeline Tracking** - Captures when symptoms started and their progression for better diagnosis
-- �🔒 **HIPAA Compliant** - Secure data handling and encryption
+- � **Symptom Timeline Tracking** - Captures when symptoms started and their progression for better diagnosis- 👨‍⚕️ **Specialist Finder** - Access to specialist doctors and hospitals for each diagnosed disease
+- 📄 **PDF Report Download** - Download professional diagnosis reports in HTML format
+- 💬 **WhatsApp Sharing** - Share diagnosis results directly via WhatsApp with medical disclaimer- �🔒 **HIPAA Compliant** - Secure data handling and encryption
 - 📱 **User-Friendly Interface** - Intuitive forms with individual lab input fields (no JSON required)
 - 🎨 **Professional Design** - Modern UI with branded color palette
 - 🌐 **500+ Diseases** - Recognizes and analyzes a wide range of rare conditions
@@ -83,13 +84,15 @@ RareDiseaseDiagnosisNavigator-Hackoclock/
 │
 ├── server/                          # Backend Node.js App
 │   ├── controllers/
-│   │   └── diagnosisController.js  # Request handlers
+│   │   └── diagnosisController.js  # Request handlers + specialist lookup
 │   ├── routes/
-│   │   └── diagnosisRoutes.js      # Route definitions
+│   │   └── diagnosisRoutes.js      # Route definitions (diagnosis + specialists)
 │   ├── services/
-│   │   └── groqService.js          # AI analysis logic
+│   │   └── groqService.js          # AI analysis logic with timeline support
 │   ├── models/
-│   │   └── Diagnosis.js            # MongoDB schema
+│   │   └── Diagnosis.js            # MongoDB schema with timeline tracking
+│   ├── data/
+│   │   └── doctorsAndHospitals.js  # Database of specialists and hospitals (10+ diseases)
 │   ├── server.js                   # Express server setup
 │   ├── package.json
 │   └── .env                        # Environment variables
@@ -187,15 +190,21 @@ npm run dev
    - Automatically transitions to results
 
 6. **Results Page** (`/results`)
-   - Displays AI-ranked diagnoses
+   - Displays AI-ranked diagnoses in professional cards
    - Each result card shows:
-     - Disease name
-     - Confidence percentage (color-coded)
-     - Medical reasoning
-     - Recommended next steps
-   - Action buttons:
-     - "New Diagnosis" - Return to diagnosis page
-     - "Print Results" - Print for medical records
+     - Disease name with gradient header
+     - Confidence percentage (color-coded: Green 80%+, Yellow 65-79%, Orange 50-64%, Red <50%)
+     - Medical reasoning for diagnosis
+     - Recommended next steps and tests
+   - **Expandable Specialist Section**:
+     - 👨‍⚕️ Specialist doctors with contact details (name, specialization, hospital, location, phone)
+     - 🏥 Nearby hospitals with addresses and specializations
+     - 🔬 Recommended diagnostic tests for the disease
+   - **Action Buttons**:
+     - "← New Diagnosis" - Return to diagnosis page
+     - "🖨️ Print Results" - Print for medical records
+     - "📥 Download PDF" - Download professional HTML report (can be printed to PDF)
+     - "💬 Share on WhatsApp" - Share diagnosis results via WhatsApp with disclaimer
 
 ### API Endpoint
 
@@ -241,6 +250,56 @@ npm run dev
   "message": "Diagnosis analysis completed successfully"
 }
 ```
+
+**GET** `/api/specialists/:diseaseName`
+
+**Purpose**: Fetch specialist doctors and hospitals information for a specific disease
+
+**Parameters:**
+- `diseaseName` (string, required) - Name of the disease (URL encoded)
+- Example: `/api/specialists/Systemic%20Lupus%20Erythematosus`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "specialists": [
+      {
+        "name": "Dr. Sarah Mitchell",
+        "specialization": "Rheumatologist",
+        "experience": "15+ years in SLE management",
+        "hospital": "Apollo Hospitals",
+        "location": "New Delhi, India",
+        "contact": "+91-11-4141-1111",
+        "email": "dr.sarah@apollo.com"
+      }
+    ],
+    "hospitals": [
+      {
+        "name": "Apollo Hospitals",
+        "location": "New Delhi, India",
+        "contact": "+91-11-4141-1111",
+        "specialization": "Rheumatology & Autoimmune Diseases",
+        "website": "www.apollohospitals.com"
+      }
+    ],
+    "tests": "ANA, Anti-dsDNA, Anti-Smith antibodies, Complement levels"
+  }
+}
+```
+
+**Supported Diseases** (10+ diseases in database):
+- Systemic Lupus Erythematosus (SLE)
+- Ehlers-Danlos Syndrome
+- Marfan Syndrome
+- Myasthenia Gravis
+- Sarcoidosis
+- Behçet's Disease
+- Granulomatosis with Polyangiitis
+- Pemphigus Vulgaris
+- Hereditary Angioedema
+- Primary Biliary Cholangitis
 
 ## 🎨 Design System
 
@@ -384,13 +443,72 @@ Auto-navigate to /results
 Result Page Displays Results
 ```
 
+## ✅ Completed Features
+
+**Core Functionality:**
+- ✅ Backend API with Groq integration (llama-3.3-70b-versatile)
+- ✅ MongoDB connection and Mongoose models
+- ✅ POST /api/diagnosis endpoint with validation
+- ✅ Frontend routing with React Router v7
+
+**Frontend Pages & Components:**
+- ✅ LandingPage with background image (bg.png)
+- ✅ HomePage with statistics and features
+- ✅ AboutPage with mission, vision, values, and technology
+- ✅ Diagnose page with user-friendly form
+- ✅ Result page with result.png background
+- ✅ Navbar and Footer components
+- ✅ SplashScreen (7-second animation, shows on every refresh)
+
+**Form & Input:**
+- ✅ User-friendly symptoms input (no JSON required)
+- ✅ 7 individual lab result fields (hemoglobin, WBC, platelets, glucose, ESR, creatinine, albumin)
+- ✅ Timeline tracking (symptom start date and progression description)
+- ✅ Form validation with error messages
+
+**Results & Analysis:**
+- ✅ ResultCard component with confidence bars and color coding
+- ✅ AI-powered disease matching algorithm
+- ✅ Top 5+ disease suggestions with confidence scores (70%+)
+- ✅ "Why this match" explanations
+- ✅ Recommended tests and next steps for each diagnosis
+
+**Advanced Features:**
+- ✅ Specialist doctors finder (👨‍⚕️ name, specialization, hospital, location, contact)
+- ✅ Hospital information database (🏥 addresses, specializations, websites)
+- ✅ GET /api/specialists/:diseaseName endpoint
+- ✅ Expandable specialist sections in result cards
+- ✅ 10+ diseases with specialist data in database
+- ✅ PDF report download (HTML format, can print to PDF)
+- ✅ WhatsApp sharing with medical disclaimer
+- ✅ Print functionality for medical records
+
+**UI/UX & Design:**
+- ✅ Responsive design with Tailwind CSS
+- ✅ Professional color system (#1E3A8A, #10B981, #22C55E)
+- ✅ Loading animation (dual rotating circles with bouncing dots)
+- ✅ localStorage for result persistence
+- ✅ Auto-navigation from Diagnose → Loader → Results
+- ✅ Medical disclaimers on results
+
+**Data & Storage:**
+- ✅ MongoDB schema with timeline tracking
+- ✅ Diagnosis records stored with symptoms, labs, timeline, results
+- ✅ localStorage for client-side result caching
+- ✅ Non-blocking database saves
+
+**Documentation:**
+- ✅ Comprehensive README.md with setup instructions
+- ✅ API endpoint documentation with examples
+- ✅ Project structure documentation
+- ✅ Technology stack documentation
+
 ## 🎯 Features Coming Soon
 
 - 📱 Mobile app (React Native)
 - 🌍 Multi-language support
 - 🔐 User authentication & accounts
-- 📊 Diagnosis history tracking
-- 🖨️ PDF report generation
+- 📊 Diagnosis history tracking & retrieval
 - 📧 Email report delivery
 - 🌙 Dark mode toggle
 - 🔍 Advanced filtering & search
