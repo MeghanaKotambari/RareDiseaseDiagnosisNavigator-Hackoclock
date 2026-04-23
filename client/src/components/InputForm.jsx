@@ -5,6 +5,8 @@ import axios from "axios";
 const InputForm = ({ setLoading, setError }) => {
   const navigate = useNavigate();
   const [symptoms, setSymptoms] = useState("");
+  const [symptomStartDate, setSymptomStartDate] = useState("");
+  const [timelineDescription, setTimelineDescription] = useState("");
   const [labs, setLabs] = useState({
     hemoglobin: "",
     WBC: "",
@@ -46,6 +48,10 @@ const InputForm = ({ setLoading, setError }) => {
 
       const res = await axios.post("http://localhost:3000/api/diagnosis", {
         symptoms: symptoms.trim(),
+        timeline: {
+          symptomStartDate: symptomStartDate || null,
+          description: timelineDescription.trim() || null,
+        },
         labs: filteredLabs,
       });
 
@@ -92,6 +98,50 @@ const InputForm = ({ setLoading, setError }) => {
             rows={5}
           />
           <p className="text-sm text-gray-500 mt-2">Separate multiple symptoms with commas</p>
+        </div>
+
+        {/* Timeline Section */}
+        <div className="mb-10">
+          <label className="block text-lg font-semibold text-[#1E3A8A] mb-4">
+            📅 Symptom Timeline (Optional)
+          </label>
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <p className="text-sm text-gray-600 mb-6">
+              Help us understand the progression of symptoms for better diagnosis
+            </p>
+
+            {/* Timeline Fields Grid */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Symptom Start Date */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  When did symptoms start?
+                </label>
+                <input
+                  type="date"
+                  value={symptomStartDate}
+                  onChange={(e) => setSymptomStartDate(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981]/20"
+                />
+                <p className="text-xs text-gray-500 mt-1">Leave blank if date is unknown</p>
+              </div>
+
+              {/* Timeline Description */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Symptom Progression
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Started suddenly, worsening daily, intermittent"
+                  value={timelineDescription}
+                  onChange={(e) => setTimelineDescription(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981]/20"
+                />
+                <p className="text-xs text-gray-500 mt-1">Describe how symptoms have progressed</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Lab Results Section */}

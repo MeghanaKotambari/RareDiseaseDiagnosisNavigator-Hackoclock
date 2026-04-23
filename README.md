@@ -19,7 +19,8 @@ Sanjeevani AI is a web application that leverages advanced AI models to provide 
 - 💯 **99% Accuracy** - Based on comprehensive medical data and latest research
 - ⚡ **Fast Results** - Get diagnostic suggestions in seconds, not days
 - 📊 **Confidence Scoring** - Each diagnosis includes confidence percentages and reasoning
-- 🔒 **HIPAA Compliant** - Secure data handling and encryption
+- � **Symptom Timeline Tracking** - Captures when symptoms started and their progression for better diagnosis
+- �🔒 **HIPAA Compliant** - Secure data handling and encryption
 - 📱 **User-Friendly Interface** - Intuitive forms with individual lab input fields (no JSON required)
 - 🎨 **Professional Design** - Modern UI with branded color palette
 - 🌐 **500+ Diseases** - Recognizes and analyzes a wide range of rare conditions
@@ -174,6 +175,7 @@ npm run dev
 4. **Diagnosis Page** (`/diagnose`)
    - User-friendly form with:
      - **Symptoms Input**: Comma-separated or natural language
+     - **Symptom Timeline** (Optional): Capture when symptoms started and how they've progressed
      - **Lab Results**: Individual fields for:
        - Hemoglobin, WBC, Platelets
        - Glucose, ESR, Creatinine, Albumin
@@ -203,6 +205,10 @@ npm run dev
 ```json
 {
   "symptoms": "persistent headache, fever, joint pain, fatigue",
+  "timeline": {
+    "symptomStartDate": "2024-04-15",
+    "description": "Started suddenly, worsening daily"
+  },
   "labs": {
     "hemoglobin": "13.5 g/dL",
     "WBC": "7500 cells/mcL",
@@ -212,6 +218,10 @@ npm run dev
   }
 }
 ```
+
+**Timeline Fields (Optional):**
+- `symptomStartDate`: Date when symptoms began (format: YYYY-MM-DD)
+- `description`: How symptoms have progressed (e.g., "Started suddenly", "Intermittent", "Worsening daily")
 
 **Response:**
 ```json

@@ -3,7 +3,7 @@ const Diagnosis = require('../models/Diagnosis');
 
 const getDiagnosis = async (req, res) => {
   try {
-    const { symptoms, labs } = req.body;
+    const { symptoms, labs, timeline } = req.body;
 
     // Validation
     if (!symptoms || typeof symptoms !== 'string' || symptoms.trim() === '') {
@@ -33,14 +33,15 @@ const getDiagnosis = async (req, res) => {
       }
     }
 
-    // Call Groq service
-    const diagnosisResult = await analyzeDiagnosis(symptoms, labsData);
+    // Call Groq service with timeline data
+    const diagnosisResult = await analyzeDiagnosis(symptoms, labsData, timeline);
 
     // Save to MongoDB (non-blocking)
     try {
       const diagnosisRecord = new Diagnosis({
         symptoms,
         labs: labsData,
+        timeline: timeline || {},
         diagnoses: diagnosisResult,
       });
       await diagnosisRecord.save();

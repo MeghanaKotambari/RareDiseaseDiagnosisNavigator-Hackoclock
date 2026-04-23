@@ -6,6 +6,16 @@ const diagnosisSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    timeline: {
+      symptomStartDate: {
+        type: String,
+        default: null,
+      },
+      description: {
+        type: String,
+        default: null,
+      },
+    },
     labs: {
       type: mongoose.Schema.Types.Mixed,
       required: true,

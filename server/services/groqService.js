@@ -12,16 +12,28 @@ const getGroqClient = () => {
   return client;
 };
 
-const analyzeDiagnosis = async (symptoms, labs) => {
+const analyzeDiagnosis = async (symptoms, labs, timeline = {}) => {
   try {
     const groq = getGroqClient();
     const labsString = typeof labs === 'object' ? JSON.stringify(labs) : labs;
+    
+    // Build timeline context
+    let timelineContext = '';
+    if (timeline.symptomStartDate || timeline.description) {
+      timelineContext = `\n\nSymptom Timeline:`;
+      if (timeline.symptomStartDate) {
+        timelineContext += `\nSymptoms started on: ${timeline.symptomStartDate}`;
+      }
+      if (timeline.description) {
+        timelineContext += `\nProgression: ${timeline.description}`;
+      }
+    }
 
     const prompt = `You are a medical AI specialized in rare diseases.
 Analyze the patient symptoms and lab results.
 
 Patient Symptoms:
-${symptoms}
+${symptoms}${timelineContext}
 
 Lab Results:
 ${labsString}
