@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 const ResultCard = ({ item }) => {
   // Parse confidence percentage
   const confidenceValue = parseInt(item.confidence) || 0;
-  const [expandDetails, setExpandDetails] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [specialistData, setSpecialistData] = useState(null);
   const [loadingSpecialists, setLoadingSpecialists] = useState(false);
   
@@ -18,12 +18,13 @@ const ResultCard = ({ item }) => {
     confidenceColor = "bg-orange-500";
   }
 
-  // Fetch specialist information when expanding
-  useEffect(() => {
-    if (expandDetails && !specialistData && !loadingSpecialists) {
-      fetchSpecialists();
+  // Handle button click to open modal
+  const handleFindSpecialists = async () => {
+    setShowModal(true);
+    if (!specialistData && !loadingSpecialists) {
+      await fetchSpecialists();
     }
-  }, [expandDetails]);
+  };
 
   const fetchSpecialists = async () => {
     try {
@@ -89,67 +90,140 @@ const ResultCard = ({ item }) => {
           </p>
         </div>
 
-        {/* Expand Details Button */}
+        {/* Find Specialists Button */}
         <button
-          onClick={() => setExpandDetails(!expandDetails)}
+          onClick={handleFindSpecialists}
           className="w-full bg-gradient-to-r from-[#1E3A8A]/80 to-[#10B981]/80 text-white py-2 rounded-lg text-sm font-semibold hover:from-[#1E3A8A] hover:to-[#10B981] transition mt-4"
         >
-          {expandDetails ? "Hide Details ⬆️" : "Find Specialists & Hospitals ⬇️"}
+          🔍 Find Specialists & Hospitals
         </button>
 
-        {/* Specialist Details Section */}
-        {expandDetails && (
-          <div className="mt-5 border-t pt-5 bg-blue-50 -mx-5 -mb-5 px-5 py-5">
-            {loadingSpecialists ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-gray-600">Loading specialist information...</p>
+        {/* Specialist Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-gradient-to-r from-[#1E3A8A] to-[#10B981] text-white p-6 flex justify-between items-center">
+                <h2 className="text-2xl font-bold">🏥 {item.name}</h2>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-white hover:bg-white/20 rounded-full p-2 transition text-2xl"
+                >
+                  ✕
+                </button>
               </div>
-            ) : specialistData ? (
-              <>
-                {/* Specialists */}
-                {specialistData.specialists && specialistData.specialists.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="font-bold text-[#1E3A8A] text-sm mb-2">👨‍⚕️ Specialist Doctors</h4>
-                    {specialistData.specialists.map((doc, idx) => (
-                      <div key={idx} className="bg-white p-3 rounded mb-2 text-xs border border-gray-200">
-                        <p className="font-semibold text-gray-800">{doc.name}</p>
-                        <p className="text-gray-600">{doc.specialization}</p>
-                        <p className="text-gray-600">{doc.hospital}, {doc.location}</p>
-                        <p className="text-blue-600 font-semibold mt-1">{doc.contact}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
 
-                {/* Hospitals */}
-                {specialistData.hospitals && specialistData.hospitals.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="font-bold text-[#10B981] text-sm mb-2">🏥 Nearby Hospitals</h4>
-                    {specialistData.hospitals.map((hosp, idx) => (
-                      <div key={idx} className="bg-white p-3 rounded mb-2 text-xs border border-gray-200">
-                        <p className="font-semibold text-gray-800">{hosp.name}</p>
-                        <p className="text-gray-600">{hosp.location}</p>
-                        <p className="text-green-600 font-semibold">{hosp.contact}</p>
+              {/* Modal Content */}
+              <div className="p-6">
+                {loadingSpecialists ? (
+                  <div className="text-center py-8">
+                    <div className="inline-block">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#10B981]"></div>
+                    </div>
+                    <p className="text-gray-600 mt-4">Loading specialist information...</p>
+                  </div>
+                ) : specialistData ? (
+                  <>
+                    {/* Specialists Section */}
+                    {specialistData.specialists && specialistData.specialists.length > 0 && (
+                      <div className="mb-8">
+                        <h3 className="text-xl font-bold text-[#1E3A8A] mb-4 pb-2 border-b-2 border-[#10B981]">👨‍⚕️ Specialist Doctors</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {specialistData.specialists.map((doc, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-gradient-to-br from-blue-50 to-green-50 p-4 rounded-lg border-2 border-[#1E3A8A]/20 hover:shadow-md transition"
+                            >
+                              <p className="text-lg font-bold text-[#1E3A8A] mb-2">{doc.name}</p>
+                              <p className="text-sm text-[#10B981] font-semibold mb-1">{doc.specialization}</p>
+                              <p className="text-sm text-gray-700 mb-1">{doc.experience}</p>
+                              <p className="text-sm text-gray-600 mb-3">{doc.hospital}</p>
+                              <div className="bg-white p-3 rounded border border-gray-200">
+                                <p className="text-xs text-gray-600 mb-1">
+                                  <strong>📍 Location:</strong> {doc.location}
+                                </p>
+                                <p className="text-xs text-blue-600 font-semibold mb-1">
+                                  <strong>📞 Contact:</strong> {doc.contact}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  <strong>📧 Email:</strong> {doc.email}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    )}
 
-                {/* Tests */}
-                {specialistData.tests && (
-                  <div>
-                    <h4 className="font-bold text-[#1E3A8A] text-sm mb-2">🔬 Recommended Tests</h4>
-                    <p className="text-xs text-gray-700 bg-white p-3 rounded border border-gray-200">
-                      {specialistData.tests}
-                    </p>
+                    {/* Hospitals Section */}
+                    {specialistData.hospitals && specialistData.hospitals.length > 0 && (
+                      <div className="mb-8">
+                        <h3 className="text-xl font-bold text-[#10B981] mb-4 pb-2 border-b-2 border-[#10B981]">🏥 Recommended Hospitals</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {specialistData.hospitals.map((hosp, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-gradient-to-br from-green-50 to-blue-50 p-4 rounded-lg border-2 border-[#10B981]/20 hover:shadow-md transition"
+                            >
+                              <p className="text-lg font-bold text-[#10B981] mb-2">{hosp.name}</p>
+                              <p className="text-sm text-[#1E3A8A] font-semibold mb-1">{hosp.specialization}</p>
+                              <div className="bg-white p-3 rounded border border-gray-200">
+                                <p className="text-xs text-gray-600 mb-2">
+                                  <strong>📍 Location:</strong> {hosp.location}
+                                </p>
+                                <p className="text-xs text-green-600 font-semibold mb-2">
+                                  <strong>📞 Contact:</strong> {hosp.contact}
+                                </p>
+                                <a
+                                  href={`https://${hosp.website}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-blue-600 hover:underline"
+                                >
+                                  <strong>🌐 Website:</strong> {hosp.website}
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tests Section */}
+                    {specialistData.tests && (
+                      <div className="mb-6">
+                        <h3 className="text-xl font-bold text-[#1E3A8A] mb-4 pb-2 border-b-2 border-[#10B981]">🔬 Recommended Diagnostic Tests</h3>
+                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-5 rounded-lg border-2 border-[#1E3A8A]/20">
+                          <p className="text-sm text-gray-700 leading-relaxed">{specialistData.tests}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Disclaimer */}
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                      <p className="text-xs text-yellow-800">
+                        <strong>⚠️ Important:</strong> This information is provided for reference purposes. Please contact the hospital directly to verify current services and specialist availability before visiting.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-lg text-gray-600">❌ Unable to load specialist information</p>
+                    <p className="text-sm text-gray-500 mt-2">Please contact nearby major hospitals for more information about {item.name}</p>
                   </div>
                 )}
-              </>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-sm text-gray-600">Unable to load specialist information</p>
               </div>
-            )}
+
+              {/* Modal Footer */}
+              <div className="bg-gray-50 px-6 py-4 border-t flex justify-end gap-3">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:bg-gray-400 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
